@@ -19,7 +19,7 @@ ditulis=0
 while True:
 	recv_size = int(sock.recv(128))
 	data, addr = sock.recvfrom(1024)
-	print data
+    print data
 	print "blok ", len(data), data[0:1]
 	fp.write(data)
 	ditulis = ditulis + 1
