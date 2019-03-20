@@ -12,8 +12,9 @@ ukuran = os.stat(namafile).st_size
 with open(namafile,'rb') as fp:
 	k = fp.read()
 	terkirim=0
-	for x in k:
-		sock.sendto(str(ukuran), (TARGET_IP, TARGET_PORT))
+	sock.sendto(str(ukuran), (TARGET_IP, TARGET_PORT))
+	for x in k:		
 		sock.sendto(x, (TARGET_IP, TARGET_PORT))
 		terkirim = terkirim + 1
 		print "\r terkirim {} of {} " . format(terkirim,ukuran)
+		print x

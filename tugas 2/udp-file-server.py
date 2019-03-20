@@ -1,5 +1,6 @@
 import socket
 
+# sets constants
 SERVER_IP = '127.0.0.1'
 SERVER_PORT = 5005
 NAMAFILE='new_data.jpg'
@@ -13,19 +14,29 @@ sock.bind((SERVER_IP, SERVER_PORT))
 # opens new file to be received
 fp = open(NAMAFILE,'wb+')
 
+print "Waiting"
+
 # flag check if file has been received completely
 ditulis=0
 
+# gets image size
+recv_size = int(sock.recv(128))
+
 while True:
-	recv_size = int(sock.recv(128))
-	data, addr = sock.recvfrom(1024)
-    print data
-	print "blok ", len(data), data[0:1]
+	# gets chunks of image data and sender address
+	data, addr = sock.recvfrom(2048)
+
+	# prints received data
+	print "blok ", len(data), data
+
+	# adds received image data
 	fp.write(data)
-	ditulis = ditulis + 1
+
+	# increments written data image
+	ditulis = ditulis + len(data)
 
 	if recv_size == ditulis:
-		print "File sukses diterima."
+		print "File received comletely."
 		break
 
 fp.close()
