@@ -14,7 +14,7 @@ sock.bind((SERVER_IP, SERVER_PORT))
 # opens new file to be received
 fp = open(NAMAFILE,'wb+')
 
-print "Waiting"
+print ("Waiting")
 
 # flag check if file has been received completely
 ditulis=0
@@ -27,7 +27,7 @@ while True:
 	data, addr = sock.recvfrom(2048)
 
 	# prints received data
-	print "blok ", len(data), data
+	print ("blok ", len(data), data)
 
 	# adds received image data
 	fp.write(data)
@@ -36,7 +36,7 @@ while True:
 	ditulis = ditulis + len(data)
 
 	if recv_size == ditulis:
-		print "File received comletely."
+		print ("File received comletely.")
 		break
 
 fp.close()
