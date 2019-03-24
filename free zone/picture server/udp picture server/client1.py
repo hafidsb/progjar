@@ -19,15 +19,15 @@ sock.sendto(("client").encode('utf8'), (TARGET_IP,TARGET_PORT))
 response_connection = sock.recv(128).decode('utf8')
 print(response_connection)
 
-# send image request
-sock.sendto(("image").encode('utf8'), (TARGET_IP,TARGET_PORT))
-
-# accept image response
-img_size = int(sock.recv(128).decode('utf8'))
-print(img_size)
-
 # first image handler
 with open(FILE_NAME, 'wb+') as fo:
+    # send image request
+    sock.sendto(("image").encode('utf8'), (TARGET_IP,TARGET_PORT))
+
+    # accept image response
+    img_size = int(sock.recv(128).decode('utf8'))
+    print(img_size)
+
     data_written = 0
 
     while True:
@@ -55,15 +55,15 @@ sock.sendto(("client2").encode('utf8'), (TARGET_IP,TARGET_PORT))
 response_connection = sock.recv(128).decode('utf8')
 print(response_connection)
 
-# send 2nd image request
-sock.sendto(("image2").encode('utf8'), (TARGET_IP,TARGET_PORT))
-
-# accept 2nd image response
-img_size2 = int(sock.recv(128).decode('utf8'))
-print(img_size2)
-
 # second image handler
 with open(FILE_NAME_2, 'wb+') as fo:
+    # send 2nd image request
+    sock.sendto(("image2").encode('utf8'), (TARGET_IP,TARGET_PORT))
+
+    # accept 2nd image response
+    img_size2 = int(sock.recv(128).decode('utf8'))
+    print(img_size2)
+
     data_written = 0
     
     while True:
