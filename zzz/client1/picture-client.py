@@ -20,12 +20,13 @@ try:
         file_size = sock.recv(128).decode('utf8')        
         print(file_size)
 
-        sock.sendall(("Size recieved").encode('utf8'))
+        sock.sendall(("Size received").encode('utf8'))
         img_file = sock.recv(int(file_size)) 
 
         fp.write(img_file)
         print("Image successfully received")
 
 finally:
+    sock.sendall(("Disconnected").encode('utf8'))
     sock.close()
 
