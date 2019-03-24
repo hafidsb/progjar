@@ -23,7 +23,7 @@ def handleClient(client, id):
                     #clients.pop(id)
                     pass
         finally:            
-            eprint(id, " client has been disconnected")
+            eprint("client-", id+1, "has been disconnected")
             clientConnected = False
 
 # Not so random var declaration
