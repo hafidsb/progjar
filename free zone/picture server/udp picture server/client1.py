@@ -48,6 +48,7 @@ with open(FILE_NAME, 'wb+') as fo:
             print(data_written, img_size)
             sock.close()
             break
+            
 # send 2nd connection request
 sock.sendto(("client2").encode('utf8'), (TARGET_IP,TARGET_PORT))
 
