@@ -3,7 +3,15 @@ import socket, os, threading, time
 # CONSTANTS
 SERVER_IP = 'localhost'
 SERVER_PORT = 9000
-IMAGE_STASH = ['Images/small.jpg', 'Images/spaghett.jpg', 'Images/uwu.jpg', 'Images/hero.png']
+IMAGE_FORMAT = ['jpg', 'png', 'gif']
+IMAGE_STASH = []
+
+# scan image in Images folder 
+with os.scandir('Images') as images:
+    for img in images:
+        # only scan image format
+        if img.name[-3:] in IMAGE_FORMAT:
+            IMAGE_STASH.append("Images/" + img.name)
 
 # threads
 class clientThread(threading.Thread):
@@ -32,19 +40,22 @@ def handleClient(addr, id):
             # send client details
             sock.sendto(str(id).encode('utf8'), addr)
             
-            # send data
+            # sending data
             data = fopen.read(5)
             data_sent = 0
-
             while data:
                 sock.sendto(data, addr)
                 data_sent += len(data)
                 data = fopen.read(5)
+
         print("Successfully sent {} image to {}".format(i+1, addr))
+
+        # send file sending status
         if i < len(IMAGE_STASH) - 1:
             sock.sendto("Masih".encode('utf8'), addr)
+
     sock.sendto("Kelar".encode('utf8'), addr)
-    
+
 
 
 # variables

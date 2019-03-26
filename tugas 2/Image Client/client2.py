@@ -3,9 +3,7 @@ import socket, os, errno
 # CONSTANTS
 TARGET_IP = 'localhost'
 TARGET_PORT = 9000
-FILE_NAME = 'download1.jpg'
-FILE_NAME_2 = 'download2.jpg'
-BASE_NAME = '%s/new_%s'
+BASE_NAME = '%s/new_%s_%s'
 
 # variables
 clientRunning = True
@@ -23,6 +21,7 @@ while clientRunning:
     try:
         response = sock.recv(128).decode('utf8')
 
+        # get server initial response
         if response == "Request accepted, sending image":
             sendingImage = True
             while sendingImage:
@@ -31,11 +30,12 @@ while clientRunning:
                 file_name = file_name.replace('Images/', '')
                 file_size = int(sock.recv(128).decode('utf8'))
 
-                print(file_name, file_size)
+                # image metadata
                 data_written = 0
                 client_id = "client" + sock.recv(32).decode('utf8')
-                image_name = BASE_NAME % (client_id, file_name)
+                image_name = BASE_NAME % (client_id, client_id, file_name)
                 
+                # create directory if not exist
                 if not os.path.exists(os.path.dirname(image_name)):
                     try:
                         os.makedirs(os.path.dirname(image_name))
@@ -43,6 +43,7 @@ while clientRunning:
                         if exc.errno != errno.EEXIST:
                             raise
                 
+                # open file to be written
                 with open(image_name, 'wb+') as fopen:
                     while True:
                         img_data = sock.recv(64)
@@ -52,6 +53,7 @@ while clientRunning:
                         if data_written == file_size:
                             print("Image '{}' received successfully!".format(file_name))                            
                             break
+                # receive image delivery status            
                 sending_status = sock.recv(128).decode('utf8')
                 if sending_status == "Masih":
                     pass
@@ -62,8 +64,10 @@ while clientRunning:
             print("All images received successfully!")
             print("Shutting down client ..")
             clientRunning = False
+        
+        # handling unexpected server response
         else:
-            print(response)
+            print("Unexpected response: {}".format(response))
 
     except socket.timeout:
         print("Connection timed out ..")
