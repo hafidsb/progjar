@@ -4,5 +4,6 @@
 
 ## How to use
 - Run `server2.py` inside Image Server folder
-- Run `client2.py` inside Image Client folder as many as needed
-** Use __python 3__! **
+- Run `client2.py` inside Image Client folder as many as needed  
+
+**Use __python 3__!**
