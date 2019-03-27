@@ -92,4 +92,4 @@ while serverRunning:
         serverRunning = False
         print("Server timeout ..")
         sock.close()
-        print("Shuting down server ..")
+        print("Shutting down server ..")
