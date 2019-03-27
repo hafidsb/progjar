@@ -1,6 +1,6 @@
-# Tugas 3() - TCP Image File Server
+# Tugas 3(**UTS**) - TCP Image File Server
 
-![180399](https://user-images.githubusercontent.com/32842793/55048482-eb92a800-507a-11e9-8bfc-eed181cdf73b.jpg)
+![1553657252787](https://user-images.githubusercontent.com/32842793/55048644-83909180-507b-11e9-829f-0c1fbd7535cd.jpg)
 
 ## How to use (using _python 3_)
 - Run `server2.py` inside Image Server folder
