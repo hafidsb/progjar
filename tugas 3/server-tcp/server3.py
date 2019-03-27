@@ -1,4 +1,4 @@
-import socket, threading
+import socket, threading, os
 
 # threads
 class clientHandler(threading.Thread):
@@ -6,14 +6,18 @@ class clientHandler(threading.Thread):
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.conn = conn
-    
+
     def run(self):
         print("Thread {} is running".format(self.threadID))
+        sock.settimeout(None)
         handleClient(self.threadID, self.conn, sock)
+        sock.settimeout(0)
 
 # functions
+def downloadAll():
+    pass
+
 def handleClient(id, conn, sock):
-    conn.sendall(("Server is ready").encode('utf8'))
     bothConnected = True    
 
     try:
@@ -23,12 +27,40 @@ def handleClient(id, conn, sock):
             
             client_request = conn.recv(128).decode('utf8')
 
-            if client_request == "ENDCON":                
-                print("Client ended the connection")
-                bothConnected = False
+            if client_request == "exit":                
+                print("\nClient ended the connection")
+                bothConnected = False    
 
-            else: 
+            elif client_request == "ls": 
                 print(client_request)
+            
+            elif client_request == "download all":
+                for i in range(len(STORAGE)):
+                    with open(STORAGE[i], 'rb') as fopen:
+                        # send file name
+                        conn.sendall(STORAGE[i].encode('utf8'))
+                        
+                        # send file size
+                        size = os.stat(STORAGE[i]).st_size
+                        conn.sendall(str(size).encode('utf8'))
+
+                        # send client details
+                        conn.sendall(str(id).encode('utf8'))
+                        
+                        # sending data
+                        conn.sendall(fopen.read())
+                       
+
+                    print("Successfully sent {} image to client-{}".format(i+1, id))
+                    print(len(STORAGE), i)
+                    # send file sending status
+                    if i < len(STORAGE) - 1:
+                        conn.sendall("Masih".encode('utf8'))
+
+                conn.sendall("Kelar".encode('utf8'))
+            
+            else:
+                print("Request {} from client-{}".format(client_request, id))
     
     except socket.timeout:
         print("Thread timeout ..")
@@ -36,31 +68,32 @@ def handleClient(id, conn, sock):
     finally:
             print("Client disconnected ..")
             print("Closing connection with client {} ..".format(id))
-            
-            # after a client disconnects reset socket timeout to default            
-            sock.settimeout(3)
-            print(sock.gettimeout())
             conn.close()
 
 # CONSTANTS
 SERVER_IP = 'localhost'
 SERVER_PORT = 9000
+STORAGE = []
+
+# scan image in Images folder 
+with os.scandir('storage') as files:
+    for f in files:
+        STORAGE.append("storage/" + f.name)
 
 # variables
 serverRunning = True
-clientCount = 0
-clients = []
-flag_conn = 0
+client_count = 0
+clients = {}
 
 # create TCP socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# set default timeout
-sock.settimeout(3)
-
 # bind socket to port
 sock.bind((SERVER_IP, SERVER_PORT))
 print("Starting up on {} on port {}".format(SERVER_IP, SERVER_PORT))
+
+# set timeout
+sock.settimeout(10)
 
 # limit total connection
 sock.listen(0)
@@ -71,32 +104,30 @@ while serverRunning:
         print("Waiting for a connection ..")
         conn, client_addr = sock.accept()
         
-        print("choochoo")
-
-        # set conn status
-        flag_conn = 1
-
         # connection established
         print("Connection from {}".format(client_addr))
         
-        # client initial response check
-        request = conn.recv(128).decode('utf8')
-        if request == "Client":
-            clients.append(clientHandler(clientCount+1, conn, sock))
-            clients[clientCount].start()
-            clientCount += 1
-            print("Jumlah klien {}".format(clientCount))
+        # send initial response
+        conn.sendall(("Welcome to the picture server client-{}".format(client_count+1).encode('utf8')))
+        conn.sendall(("Server is ready").encode('utf8'))
 
-        else:
-            print("Invalid response: {}".format(request))
+        if conn not in clients:
+            clients[client_count] = clientHandler(client_count+1, conn, sock)
+            clients[client_count].start()
+            client_count += 1
     
-    except socket.timeout:
-        if flag_conn:
-            conn.close()
+    except KeyboardInterrupt:
         sock.close()        
         serverRunning = False
         
-        print("Server timeout ..")
+        print("\nServer interrupted ..")
+        print("Shutting down server ..")
+    
+    except socket.timeout:
+        sock.close()        
+        serverRunning = False
+        
+        print("\nServer timeout ..")
         print("Shutting down server ..")
         
 
